@@ -11,6 +11,7 @@ private:
     string text;
     string pattern;
     vector<int> LPS;
+    vector<string> splitted_text;
 
     //функція для підрахунку стрічок в тексті(за крапками в кінці кожного речення)
     int countN() {
@@ -19,6 +20,21 @@ private:
             if (text[i] == '.') count++;
         }
         return count;
+    }
+
+    //функція, яка розбиває текст на речення. Кожне речення зберігає у вектор
+    vector<string> split(string s) {
+        vector<string> tokens;
+        int pos = 0;
+        string token;
+        while ((pos = s.find('.')) != string::npos) {
+            token = s.substr(0, pos);
+            tokens.push_back(token);
+            s.erase(0, pos + 1);
+        }
+        tokens.push_back(s);
+
+        return tokens;
     }
 
     // Function to compute the LPS array
@@ -104,9 +120,12 @@ public:
     }
 
 
-    void individualTask(string& text, string& pattern, int number_of_strings, int index_i) {
-        if (number_of_strings < 2) return;
+    void individualTask(int number_of_strings, int index_i) {
+        
+        if (number_of_strings < 2 && number_of_strings != countN()) return;
         if (index_i > 1 && index_i < number_of_strings) return;
+
+      
     }
 };
 
