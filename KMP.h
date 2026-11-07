@@ -8,62 +8,62 @@ using namespace std;
 
 class KMP {
 private:
-    string text;
-    string pattern;
-    vector<int> LPS;
-    vector<string> splitted_text;
-
-    //функція для підрахунку стрічок в тексті(за крапками в кінці кожного речення)
-    int countN() {
-        int count = 0;
-        for (int i = 0;i < text.size();i++) {
-            if (text[i] == '.') count++;
-        }
-        return count;
-    }
+    string text; //змінна тексту
+    string pattern; //змінна слова
+    vector<int> LPS; //вектор префікс-функції
+    vector<string> splitted_text; //вектор розділених стрічок тексту
 
     //функція, яка розбиває текст на речення. Кожне речення зберігає у вектор
     void split(string s) {
-
-        int pos = 0;
-        string token;
-
+        splitted_text.clear();
+        int pos;
         while ((pos = s.find('.')) != string::npos) {
-            token = s.substr(0, pos);
-            splitted_text.push_back(token);
+            splitted_text.push_back(s.substr(0, pos + 1));
             s.erase(0, pos + 1);
+
+            // пропускаємо пробіли та переноси рядка перед наступним реченням
+            while (!s.empty() && (s[0] == ' ' || s[0] == '\r' || s[0] == '\n')) {
+                s.erase(0, 1);
+            }
         }
 
-        splitted_text.push_back(s);
+        // залишок без крапки (якщо він є) теж вважаємо стрічкою
+        if (!s.empty()) splitted_text.push_back(s);
     }
 
     //функція яка об'єднує розділені стрічки в текст
-    string groupStringsIntoText() {
+    string groupStringsIntoText(vector<string>& splitted) {
         string result = "";
-        for (int i = 0;i < splitted_text.size();i++) {
-            result += splitted_text[i];
-            result += ". ";
+        for (int i = 0;i < splitted.size();i++) {
+            result += splitted[i];
+            result += " ";
         }
         return result;
     }
 
-    // Function to compute the LPS array
+    //функція, яка обраховує префікс-функцію
     void computeLPSArray(string& text, string& pattern, int pattern_size) {
+        //створює вектор з розміром pattern_size і значенням 0
+        LPS.assign(pattern_size, 0);
+        //довжина збігу
         int length = 0;
-        LPS[0] = 0; // LPS[0] is always 0
         int i = 1;
 
+        //пошук збігів
         while (i < pattern_size) {
-            if (pattern[i] ==
-                pattern[length]) {
+            //якщо знайшли збіг - збільшуємо індекси
+            if (pattern[i] == pattern[length]) {
                 length++;
                 LPS[i] = length;
                 i++;
             }
+
             else {
+                //якщо символи різні і довжина > 0, то беремо коротшу частину збігу
                 if (length != 0) {
                     length = LPS[length - 1];
                 }
+                //якшо збігу взагалі немає
                 else {
                     LPS[i] = 0;
                     i++;
@@ -72,56 +72,38 @@ private:
         }
     }
 
-
-public:
-    string getText() const { return text; }
-
-    void createObject(string& text, string& pattern) {
-        if (text.length() == 0 || pattern.length() == 0) return;
-
-        this->text = text;
-        this->pattern = pattern;
-        LPS.resize(pattern.size());
-        computeLPSArray(text, pattern, pattern.length());
-        split(text);
-    }
-
-    // KMP algorithm to search for
-// pattern in text
-    vector<int> KMP_algorithm(string &text, string& pattern) {
+    //алгоритм кнута
+    vector<int> KMP_algorithm(string& text) {
         int pattern_size = pattern.length();
         int text_size = text.length();
 
-        // Array for storing the starting index
-        // of text, where the pattern exist
+        //вектор, в який записується на яких індексах є збіг слова
         vector<int> ans;
 
-        int i = 0; // index for text
-        int j = 0; // index for pattern
+        int i = 0; // індекс для тексту
+        int j = 0; // індекс для шуканого слова
+
         while (i < text_size) {
 
-            // When character matches so we
-            // have to increase both the pointers
+            //якщо знайшли збіг символа
             if (pattern[j] == text[i]) {
                 i++;
                 j++;
             }
 
-            // When the pattern is completely matched,
-            // store the starting position of text,
-            // Where the pattern exist
+            //якщо знайшли відразу все слово
             if (j == pattern_size) {
                 ans.push_back(i - j);
-                j = LPS[j - 1];
+                j = LPS[j - 1]; //індекс залишає ту частину кінця збігу, яка ще може бути початком наступного збігу
             }
-            // When the character is not matched,
-            // we have to move to previous index up
-            // to which the matches take place
-            else if (i < text_size && pattern[j]
-                != text[i]) {
+      
+            //якщо символи різні
+            else if (i < text_size && pattern[j] != text[i]) {
+                //частина зразка вже збіглася
                 if (j != 0) {
                     j = LPS[j - 1];
                 }
+                //взагалі нема збігу
                 else {
                     i++;
                 }
@@ -130,17 +112,38 @@ public:
         return ans;
     }
 
+public:
+    //геттер тексту
+    string getText() const { return text; }
+    //к-ть стрічок в тексті
+    int stringCount() { return splitted_text.size(); }
 
-    void individualTask(int number_of_strings, int index_i, string& result_text, vector<int>& result_index) {
+    //знайти збіг в тексті (КМП)
+    vector<int> findPattern() { return KMP_algorithm(text); }
+
+    //створити об'єкт. Повертає false, якщо текст або слово пусте
+    bool createObject(string& text, string& pattern) {
+        if (text.empty() || pattern.empty()) return false;
+
+        this->text = text;
+        this->pattern = pattern;
+        computeLPSArray(text, pattern, pattern.length());
+        split(text);
+        return true;
+    }
+
+    //індивідуальне завдання. 
+    // Повертає false, якщо індекс n < 2 або більше к-ті речень
+    // або індекс i < 1 або більше к-ть речень
+    bool individualTask(int number_of_strings, int index_i, string& result_text, vector<int>& result_index) {
         
-        if (number_of_strings < 2 || number_of_strings != countN()) return;
-        if (index_i < 1 || index_i > number_of_strings) return;
+        if (number_of_strings < 2 || number_of_strings != splitted_text.size()) return false;
+        if (index_i < 1 || index_i > number_of_strings) return false;
         
-        swap(splitted_text[index_i-1], splitted_text[number_of_strings - 2]);
-        result_text = groupStringsIntoText();
-        result_index = KMP_algorithm(result_text, pattern);
-        
+        vector<string> tmp = splitted_text;
+        swap(tmp[index_i - 1], tmp[number_of_strings - 2]);
+        result_text = groupStringsIntoText(tmp);
+        result_index = KMP_algorithm(result_text);
+        return true;
     }
 };
-
-

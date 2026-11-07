@@ -13,9 +13,26 @@ namespace lab9 {
 	using namespace System::Data;
 	using namespace System::Drawing;
 
-	/// <summary>
-	/// Summary for MyForm
-	/// </summary>
+	//функція для кодування
+	string toUtf8(String^ s) {
+		cli::array<Byte>^ bytes = System::Text::Encoding::GetEncoding(1251)->GetBytes(s);
+		string result;
+		result.reserve(bytes->Length);
+		for (int i = 0; i < bytes->Length; i++) {
+			result += (char)bytes[i];
+		}
+		return result;
+	}
+
+	//інша функція для кодування
+	String^ fromUtf8(const string& s) {
+		cli::array<Byte>^ bytes = gcnew cli::array<Byte>((int)s.size());
+		for (int i = 0; i < (int)s.size(); i++) {
+			bytes[i] = (unsigned char)s[i];
+		}
+		return System::Text::Encoding::GetEncoding(1251)->GetString(bytes);
+	}
+
 	public ref class MyForm : public System::Windows::Forms::Form
 	{
 	public:
@@ -35,9 +52,10 @@ namespace lab9 {
 			{
 				delete components;
 			}
+			delete object;
 			object = nullptr;
 		}
-	private: KMP* object;
+	private: KMP* object; //об'єкт куди записується текст, слово
 	private: System::Windows::Forms::Label^ EnterTextLabel;
 	protected:
 	private: System::Windows::Forms::TextBox^ EnterTextTextBox;
@@ -121,12 +139,14 @@ namespace lab9 {
 				static_cast<System::Byte>(204)));
 			this->EnterPatterTextBox->Location = System::Drawing::Point(507, 79);
 			this->EnterPatterTextBox->Name = L"EnterPatterTextBox";
-			this->EnterPatterTextBox->Size = System::Drawing::Size(319, 35);
+			this->EnterPatterTextBox->Size = System::Drawing::Size(336, 35);
 			this->EnterPatterTextBox->TabIndex = 3;
 			// 
 			// InfoTextBox
 			// 
 			this->InfoTextBox->BackColor = System::Drawing::SystemColors::ActiveCaption;
+			this->InfoTextBox->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(204)));
 			this->InfoTextBox->Location = System::Drawing::Point(26, 313);
 			this->InfoTextBox->Multiline = true;
 			this->InfoTextBox->Name = L"InfoTextBox";
@@ -137,6 +157,8 @@ namespace lab9 {
 			// 
 			// FindPatternButton
 			// 
+			this->FindPatternButton->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(204)));
 			this->FindPatternButton->Location = System::Drawing::Point(507, 313);
 			this->FindPatternButton->Name = L"FindPatternButton";
 			this->FindPatternButton->Size = System::Drawing::Size(319, 58);
@@ -163,25 +185,27 @@ namespace lab9 {
 				static_cast<System::Byte>(204)));
 			this->label1->Location = System::Drawing::Point(502, 232);
 			this->label1->Name = L"label1";
-			this->label1->Size = System::Drawing::Size(248, 29);
+			this->label1->Size = System::Drawing::Size(267, 29);
 			this->label1->TabIndex = 7;
-			this->label1->Text = L"Введіть к-ть стрічок:";
+			this->label1->Text = L"Введіть к-ть стрічок n:";
 			// 
 			// IndexIUpDown
 			// 
 			this->IndexIUpDown->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(204)));
-			this->IndexIUpDown->Location = System::Drawing::Point(758, 144);
+			this->IndexIUpDown->Location = System::Drawing::Point(775, 144);
 			this->IndexIUpDown->Maximum = System::Decimal(gcnew cli::array< System::Int32 >(4) { 15, 0, 0, 0 });
+			this->IndexIUpDown->Minimum = System::Decimal(gcnew cli::array< System::Int32 >(4) { 1, 0, 0, 0 });
 			this->IndexIUpDown->Name = L"IndexIUpDown";
 			this->IndexIUpDown->Size = System::Drawing::Size(68, 35);
 			this->IndexIUpDown->TabIndex = 8;
+			this->IndexIUpDown->Value = System::Decimal(gcnew cli::array< System::Int32 >(4) { 1, 0, 0, 0 });
 			// 
 			// IndexNUpDown
 			// 
 			this->IndexNUpDown->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(204)));
-			this->IndexNUpDown->Location = System::Drawing::Point(758, 232);
+			this->IndexNUpDown->Location = System::Drawing::Point(775, 232);
 			this->IndexNUpDown->Maximum = System::Decimal(gcnew cli::array< System::Int32 >(4) { 15, 0, 0, 0 });
 			this->IndexNUpDown->Minimum = System::Decimal(gcnew cli::array< System::Int32 >(4) { 1, 0, 0, 0 });
 			this->IndexNUpDown->Name = L"IndexNUpDown";
@@ -191,6 +215,8 @@ namespace lab9 {
 			// 
 			// DisplayTextButton
 			// 
+			this->DisplayTextButton->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(204)));
 			this->DisplayTextButton->Location = System::Drawing::Point(507, 389);
 			this->DisplayTextButton->Name = L"DisplayTextButton";
 			this->DisplayTextButton->Size = System::Drawing::Size(319, 58);
@@ -201,6 +227,8 @@ namespace lab9 {
 			// 
 			// IndividualTaskButton
 			// 
+			this->IndividualTaskButton->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Regular,
+				System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(204)));
 			this->IndividualTaskButton->Location = System::Drawing::Point(507, 470);
 			this->IndividualTaskButton->Name = L"IndividualTaskButton";
 			this->IndividualTaskButton->Size = System::Drawing::Size(319, 58);
@@ -235,46 +263,79 @@ namespace lab9 {
 
 		}
 #pragma endregion
+	//кнопка для пошуку слова в тексті
 	private: System::Void FindPatternButton_Click(System::Object^ sender, System::EventArgs^ e) {
 		InfoTextBox->Clear();
-		string text = msclr::interop::marshal_as<string>(EnterTextTextBox->Text);
-		string pattern = msclr::interop::marshal_as<string>(EnterPatterTextBox->Text);
 
-		object->createObject(text, pattern);
-		vector<int> result = object->KMP_algorithm(text, pattern);
+		string text = toUtf8(EnterTextTextBox->Text);
+		string pattern = toUtf8(EnterPatterTextBox->Text);
+		vector<int> result = object->findPattern();
 
-		InfoTextBox->Text = "Result:" + Environment::NewLine +
-			"Text:" + Environment::NewLine + gcnew String(object->getText().c_str()) +
-			Environment::NewLine + "Index: ";
+		if (!object->createObject(text, pattern)) {
+			MessageBox::Show(L"Введіть текст і шукане слово.", L"Помилка");
+			return;
+		}
+
+
+		InfoTextBox->Text = "Результат:" + Environment::NewLine +
+		"Текст:" + Environment::NewLine + fromUtf8(object->getText()) +
+		Environment::NewLine + "Індекси: ";
+
+		if (result.empty()) InfoTextBox->Text += "збігів не знайдено";
 		for (int i = 0; i < result.size();i++) {
 			InfoTextBox->Text += Convert::ToString(result[i]) + " ";
 		}
 	}
-private: System::Void DisplayTextButton_Click(System::Object^ sender, System::EventArgs^ e) {
-	InfoTextBox->Clear();
-	InfoTextBox->Text = "Text:" + Environment::NewLine +
-		gcnew String(object->getText().c_str());
-}
-private: System::Void IndividualTaskButton_Click(System::Object^ sender, System::EventArgs^ e) {
-	InfoTextBox->Clear();
 
-	int index_i = Convert::ToInt32(IndexIUpDown->Text);
-	int index_n = Convert::ToInt32(IndexNUpDown->Text);
-	string result_text;
-	vector<int> result;
-
-	InfoTextBox->Text = "Individual task:" + Environment::NewLine +
-		"Text:" + Environment::NewLine +
-		gcnew String(object->getText().c_str()) + Environment::NewLine +
-		"Index n: " + Convert::ToString(index_n) + Environment::NewLine +
-		"Index i: " + Convert::ToString(index_i) + Environment::NewLine;
-	object->individualTask(index_n, index_i, result_text, result);
-	InfoTextBox->Text += "Text after individual task:" + Environment::NewLine +
-		gcnew String(result_text.c_str()) + Environment::NewLine + "Index: ";
-
-	for (int i = 0; i < result.size();i++) {
-		InfoTextBox->Text += Convert::ToString(result[i]) + " ";
+	//кнопка, яка виводить текст(початковий)
+	private: System::Void DisplayTextButton_Click(System::Object^ sender, System::EventArgs^ e) {
+		InfoTextBox->Clear();
+		if (!object->getText().empty()) {
+			MessageBox::Show(L"Спочатку натисніть «Знайти слово».", L"Помилка");
+			return;
+		}
+		InfoTextBox->Text = "Текст:" + Environment::NewLine + fromUtf8(object->getText());
 	}
-}
+
+	//кнопка для індивідуального завдання
+	private: System::Void IndividualTaskButton_Click(System::Object^ sender, System::EventArgs^ e) {
+		InfoTextBox->Clear();
+
+		string text = toUtf8(EnterTextTextBox->Text);
+		string pattern = toUtf8(EnterPatterTextBox->Text);
+		string result_text;
+		vector<int> result;
+		int index_i = Convert::ToInt32(IndexIUpDown->Value);
+		int index_n = Convert::ToInt32(IndexNUpDown->Value);
+
+		if (!object->createObject(text, pattern)) {
+			MessageBox::Show(L"Введіть текст і шукане слово.", L"Помилка");
+			return;
+		}
+
+		if (index_n < 2 || index_n != object->stringCount()) {
+			String^ msg = "n має дорівнювати кількості стрічок у тексті і бути не менше 2. " +
+				"Зараз у тексті стрічок: " + object->stringCount();
+			MessageBox::Show(msg, "Помилка");
+			return;
+		}
+		if (index_i < 1 || index_i > index_n) {
+			MessageBox::Show(L"i має бути в межах від 1 до n.", L"Помилка");
+			return;
+		}
+
+		object->individualTask(index_n, index_i, result_text, result);
+
+		InfoTextBox->Text = "Індивідуальне завдання:" + Environment::NewLine +
+			"Текст:" + Environment::NewLine + fromUtf8(object->getText()) + Environment::NewLine +
+			"n: " + index_n + Environment::NewLine +
+			"i: " + index_i + Environment::NewLine +
+			"Текст після обміну:" + Environment::NewLine + fromUtf8(result_text) +
+			Environment::NewLine + "Індекси: ";
+		if (result.empty()) InfoTextBox->Text += "збігів не знайдено";
+		for (int i = 0; i < result.size();i++) {
+			InfoTextBox->Text += Convert::ToString(result[i]) + " ";
+		}
+	}
 };
 }
