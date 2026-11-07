@@ -75,9 +75,7 @@ private:
 
 public:
 
-    //конструктор з параметрами
-    KMP(string text, string pattern) {
-
+    void createObject(string& text, string& pattern) {
         if (text.length() == 0 || pattern.length() == 0) return;
 
         this->text = text;
@@ -86,7 +84,6 @@ public:
         computeLPSArray(text, pattern, pattern.length());
         split(text);
     }
-
 
     // KMP algorithm to search for
 // pattern in text
