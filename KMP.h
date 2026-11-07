@@ -2,6 +2,7 @@
 
 #include<vector>
 #include <string>
+#include <algorithm>
 
 using namespace std;
 
@@ -11,6 +12,14 @@ private:
     string pattern;
     vector<int> LPS;
 
+    //функція для підрахунку стрічок в тексті(за крапками в кінці кожного речення)
+    int countN() {
+        int count = 0;
+        for (int i = 0;i < text.size();i++) {
+            if (text[i] == '.') count++;
+        }
+        return count;
+    }
 
     // Function to compute the LPS array
     void computeLPSArray(string& text, string& pattern, int pattern_size) {
@@ -95,7 +104,10 @@ public:
     }
 
 
-
+    void individualTask(string& text, string& pattern, int number_of_strings, int index_i) {
+        if (number_of_strings < 2) return;
+        if (index_i > 1 && index_i < number_of_strings) return;
+    }
 };
 
 
