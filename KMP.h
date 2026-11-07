@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include<vector>
 #include <string>
@@ -87,7 +87,7 @@ public:
 
     // KMP algorithm to search for
 // pattern in text
-    vector<int> KMP_algorithm(string &text) {
+    vector<int> KMP_algorithm(string &text, string& pattern) {
         int pattern_size = pattern.length();
         int text_size = text.length();
 
@@ -137,7 +137,7 @@ public:
         
         swap(splitted_text[index_i-1], splitted_text[number_of_strings - 2]);
         result_text = groupStringsIntoText();
-        result_index = KMP_algorithm(result_text);
+        result_index = KMP_algorithm(result_text, pattern);
         
     }
 };

@@ -1,4 +1,8 @@
-#pragma once
+﻿#pragma once
+
+#include <msclr/marshal_cppstd.h>
+#include "KMP.h"
+#include <iostream>
 
 namespace lab9 {
 
@@ -18,9 +22,7 @@ namespace lab9 {
 		MyForm(void)
 		{
 			InitializeComponent();
-			//
-			//TODO: Add the constructor code here
-			//
+			object = new KMP;
 		}
 
 	protected:
@@ -33,7 +35,9 @@ namespace lab9 {
 			{
 				delete components;
 			}
+			object = nullptr;
 		}
+	private: KMP* object;
 	private: System::Windows::Forms::Label^ EnterTextLabel;
 	protected:
 	private: System::Windows::Forms::TextBox^ EnterTextTextBox;
@@ -138,6 +142,7 @@ namespace lab9 {
 			this->FindPatternButton->TabIndex = 5;
 			this->FindPatternButton->Text = L"Знайти слово";
 			this->FindPatternButton->UseVisualStyleBackColor = true;
+			this->FindPatternButton->Click += gcnew System::EventHandler(this, &MyForm::FindPatternButton_Click);
 			// 
 			// EnterIndexILabel
 			// 
@@ -191,6 +196,7 @@ namespace lab9 {
 			this->DisplayTextButton->TabIndex = 10;
 			this->DisplayTextButton->Text = L"Вивести текст";
 			this->DisplayTextButton->UseVisualStyleBackColor = true;
+			this->DisplayTextButton->Click += gcnew System::EventHandler(this, &MyForm::DisplayTextButton_Click);
 			// 
 			// IndividualTaskButton
 			// 
@@ -227,5 +233,25 @@ namespace lab9 {
 
 		}
 #pragma endregion
-	};
+	private: System::Void FindPatternButton_Click(System::Object^ sender, System::EventArgs^ e) {
+		InfoTextBox->Clear();
+		string text = msclr::interop::marshal_as<string>(EnterTextTextBox->Text);
+		string pattern = msclr::interop::marshal_as<string>(EnterPatterTextBox->Text);
+
+		object->createObject(text, pattern);
+		vector<int> result = object->KMP_algorithm(text, pattern);
+
+		InfoTextBox->Text = "Result:" + Environment::NewLine +
+			"Text:" + Environment::NewLine + gcnew String(text.c_str()) +
+			Environment::NewLine + "Index: ";
+		for (int i = 0; i < result.size();i++) {
+			InfoTextBox->Text += Convert::ToString(result[i]) + " ";
+		}
+	}
+private: System::Void DisplayTextButton_Click(System::Object^ sender, System::EventArgs^ e) {
+	InfoTextBox->Clear();
+
+	
+}
+};
 }
