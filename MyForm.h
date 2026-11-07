@@ -131,6 +131,7 @@ namespace lab9 {
 			this->InfoTextBox->Multiline = true;
 			this->InfoTextBox->Name = L"InfoTextBox";
 			this->InfoTextBox->ReadOnly = true;
+			this->InfoTextBox->ScrollBars = System::Windows::Forms::ScrollBars::Vertical;
 			this->InfoTextBox->Size = System::Drawing::Size(429, 338);
 			this->InfoTextBox->TabIndex = 4;
 			// 
@@ -206,6 +207,7 @@ namespace lab9 {
 			this->IndividualTaskButton->TabIndex = 11;
 			this->IndividualTaskButton->Text = L"Індивідуальне завдання";
 			this->IndividualTaskButton->UseVisualStyleBackColor = true;
+			this->IndividualTaskButton->Click += gcnew System::EventHandler(this, &MyForm::IndividualTaskButton_Click);
 			// 
 			// MyForm
 			// 
@@ -242,7 +244,7 @@ namespace lab9 {
 		vector<int> result = object->KMP_algorithm(text, pattern);
 
 		InfoTextBox->Text = "Result:" + Environment::NewLine +
-			"Text:" + Environment::NewLine + gcnew String(text.c_str()) +
+			"Text:" + Environment::NewLine + gcnew String(object->getText().c_str()) +
 			Environment::NewLine + "Index: ";
 		for (int i = 0; i < result.size();i++) {
 			InfoTextBox->Text += Convert::ToString(result[i]) + " ";
@@ -252,6 +254,27 @@ private: System::Void DisplayTextButton_Click(System::Object^ sender, System::Ev
 	InfoTextBox->Clear();
 	InfoTextBox->Text = "Text:" + Environment::NewLine +
 		gcnew String(object->getText().c_str());
+}
+private: System::Void IndividualTaskButton_Click(System::Object^ sender, System::EventArgs^ e) {
+	InfoTextBox->Clear();
+
+	int index_i = Convert::ToInt32(IndexIUpDown->Text);
+	int index_n = Convert::ToInt32(IndexNUpDown->Text);
+	string result_text;
+	vector<int> result;
+
+	InfoTextBox->Text = "Individual task:" + Environment::NewLine +
+		"Text:" + Environment::NewLine +
+		gcnew String(object->getText().c_str()) + Environment::NewLine +
+		"Index n: " + Convert::ToString(index_n) + Environment::NewLine +
+		"Index i: " + Convert::ToString(index_i) + Environment::NewLine;
+	object->individualTask(index_n, index_i, result_text, result);
+	InfoTextBox->Text += "Text after individual task:" + Environment::NewLine +
+		gcnew String(result_text.c_str()) + Environment::NewLine + "Index: ";
+
+	for (int i = 0; i < result.size();i++) {
+		InfoTextBox->Text += Convert::ToString(result[i]) + " ";
+	}
 }
 };
 }
