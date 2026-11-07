@@ -250,8 +250,8 @@ namespace lab9 {
 	}
 private: System::Void DisplayTextButton_Click(System::Object^ sender, System::EventArgs^ e) {
 	InfoTextBox->Clear();
-
-	
+	InfoTextBox->Text = "Text:" + Environment::NewLine +
+		gcnew String(object->getText().c_str());
 }
 };
 }
