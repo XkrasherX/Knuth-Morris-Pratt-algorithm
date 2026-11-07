@@ -74,6 +74,7 @@ private:
 
 
 public:
+    string getText() const { return text; }
 
     void createObject(string& text, string& pattern) {
         if (text.length() == 0 || pattern.length() == 0) return;
