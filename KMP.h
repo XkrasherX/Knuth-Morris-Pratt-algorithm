@@ -24,17 +24,30 @@ private:
 
     //функція, яка розбиває текст на речення. Кожне речення зберігає у вектор
     vector<string> split(string s) {
+
         vector<string> tokens;
         int pos = 0;
         string token;
+
         while ((pos = s.find('.')) != string::npos) {
             token = s.substr(0, pos);
             tokens.push_back(token);
             s.erase(0, pos + 1);
         }
+
         tokens.push_back(s);
 
         return tokens;
+    }
+
+    //функція яка об'єднує розділені стрічки в текст
+    string groupStringsIntoText() {
+        string result = "";
+        for (int i = 0;i < splitted_text.size();i++) {
+            result += splitted_text[i];
+            result += ". ";
+        }
+        return result;
     }
 
     // Function to compute the LPS array
@@ -69,6 +82,7 @@ public:
         this->text = text;
         this->pattern = pattern;
         computeLPSArray(text, pattern, pattern.length());
+        splitted_text = split(text);
     }
 
 
