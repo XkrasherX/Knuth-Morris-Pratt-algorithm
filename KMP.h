@@ -77,8 +77,12 @@ public:
 
     //конструктор з параметрами
     KMP(string text, string pattern) {
+
+        if (text.length() == 0 || pattern.length() == 0) return;
+
         this->text = text;
         this->pattern = pattern;
+        LPS.resize(pattern.size());
         computeLPSArray(text, pattern, pattern.length());
         split(text);
     }
@@ -86,16 +90,13 @@ public:
 
     // KMP algorithm to search for
 // pattern in text
-    vector<int> KMP_algorithm() {
+    vector<int> KMP_algorithm(string &text) {
         int pattern_size = pattern.length();
         int text_size = text.length();
 
         // Array for storing the starting index
         // of text, where the pattern exist
         vector<int> ans;
-
-        vector<int> LPS(pattern_size);
-        computeLPSArray(text,pattern,pattern_size);
 
         int i = 0; // index for text
         int j = 0; // index for pattern
@@ -134,13 +135,13 @@ public:
 
     void individualTask(int number_of_strings, int index_i, string& result_text, vector<int>& result_index) {
         
-        if (number_of_strings < 2 && number_of_strings != countN()) return;
-        if (index_i > 1 && index_i < number_of_strings) return;
+        if (number_of_strings < 2 || number_of_strings != countN()) return;
+        if (index_i < 1 || index_i > number_of_strings) return;
         
-        swap(splitted_text[index_i], splitted_text[number_of_strings - 1]);
+        swap(splitted_text[index_i-1], splitted_text[number_of_strings - 2]);
         result_text = groupStringsIntoText();
-        result_index = KMP_algorithm();
-        sort(result_index.begin(), result_index.end());
+        result_index = KMP_algorithm(result_text);
+        
     }
 };
 
