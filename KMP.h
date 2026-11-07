@@ -23,21 +23,18 @@ private:
     }
 
     //функція, яка розбиває текст на речення. Кожне речення зберігає у вектор
-    vector<string> split(string s) {
+    void split(string s) {
 
-        vector<string> tokens;
         int pos = 0;
         string token;
 
         while ((pos = s.find('.')) != string::npos) {
             token = s.substr(0, pos);
-            tokens.push_back(token);
+            splitted_text.push_back(token);
             s.erase(0, pos + 1);
         }
 
-        tokens.push_back(s);
-
-        return tokens;
+        splitted_text.push_back(s);
     }
 
     //функція яка об'єднує розділені стрічки в текст
@@ -78,17 +75,18 @@ private:
 
 public:
 
+    //конструктор з параметрами
     KMP(string text, string pattern) {
         this->text = text;
         this->pattern = pattern;
         computeLPSArray(text, pattern, pattern.length());
-        splitted_text = split(text);
+        split(text);
     }
 
 
     // KMP algorithm to search for
 // pattern in text
-    vector<int> KMP_algorithm(string& text, string& pattern) {
+    vector<int> KMP_algorithm() {
         int pattern_size = pattern.length();
         int text_size = text.length();
 
@@ -134,12 +132,15 @@ public:
     }
 
 
-    void individualTask(int number_of_strings, int index_i) {
+    void individualTask(int number_of_strings, int index_i, string& result_text, vector<int>& result_index) {
         
         if (number_of_strings < 2 && number_of_strings != countN()) return;
         if (index_i > 1 && index_i < number_of_strings) return;
-
-      
+        
+        swap(splitted_text[index_i], splitted_text[number_of_strings - 1]);
+        result_text = groupStringsIntoText();
+        result_index = KMP_algorithm();
+        sort(result_index.begin(), result_index.end());
     }
 };
 
