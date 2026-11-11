@@ -106,7 +106,7 @@ namespace lab9 {
 			this->EnterTextLabel->AutoSize = true;
 			this->EnterTextLabel->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(204)));
-			this->EnterTextLabel->Location = System::Drawing::Point(21, 40);
+			this->EnterTextLabel->Location = System::Drawing::Point(21, 31);
 			this->EnterTextLabel->Name = L"EnterTextLabel";
 			this->EnterTextLabel->Size = System::Drawing::Size(175, 29);
 			this->EnterTextLabel->TabIndex = 0;
@@ -116,7 +116,7 @@ namespace lab9 {
 			// 
 			this->EnterTextTextBox->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(204)));
-			this->EnterTextTextBox->Location = System::Drawing::Point(26, 72);
+			this->EnterTextTextBox->Location = System::Drawing::Point(26, 63);
 			this->EnterTextTextBox->Multiline = true;
 			this->EnterTextTextBox->Name = L"EnterTextTextBox";
 			this->EnterTextTextBox->Size = System::Drawing::Size(429, 225);
@@ -147,12 +147,12 @@ namespace lab9 {
 			this->InfoTextBox->BackColor = System::Drawing::SystemColors::ActiveCaption;
 			this->InfoTextBox->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(204)));
-			this->InfoTextBox->Location = System::Drawing::Point(26, 313);
+			this->InfoTextBox->Location = System::Drawing::Point(26, 294);
 			this->InfoTextBox->Multiline = true;
 			this->InfoTextBox->Name = L"InfoTextBox";
 			this->InfoTextBox->ReadOnly = true;
 			this->InfoTextBox->ScrollBars = System::Windows::Forms::ScrollBars::Vertical;
-			this->InfoTextBox->Size = System::Drawing::Size(429, 338);
+			this->InfoTextBox->Size = System::Drawing::Size(429, 366);
 			this->InfoTextBox->TabIndex = 4;
 			// 
 			// FindPatternButton
@@ -269,28 +269,38 @@ namespace lab9 {
 
 		string text = toUtf8(EnterTextTextBox->Text);
 		string pattern = toUtf8(EnterPatterTextBox->Text);
-		vector<int> result = object->findPattern();
 
 		if (!object->createObject(text, pattern)) {
 			MessageBox::Show(L"Введіть текст і шукане слово.", L"Помилка");
 			return;
 		}
 
+		vector<int> result = object->findPattern();
 
 		InfoTextBox->Text = "Результат:" + Environment::NewLine +
-		"Текст:" + Environment::NewLine + fromUtf8(object->getText()) +
+		"Текст:" + Environment::NewLine + fromUtf8(object->getText()) + Environment::NewLine +
+		"Слово:" + fromUtf8(object->getPattern()) + 
 		Environment::NewLine + "Індекси: ";
 
 		if (result.empty()) InfoTextBox->Text += "збігів не знайдено";
 		for (int i = 0; i < result.size();i++) {
 			InfoTextBox->Text += Convert::ToString(result[i]) + " ";
 		}
+
+		InfoTextBox->Text += Environment::NewLine + L"Стрибки КМП:" + Environment::NewLine;
+
+		if (object->getJumps().empty()) {
+			InfoTextBox->Text += L"Переходів через LPS не було.";
+		}
+		else {
+			InfoTextBox->Text += fromUtf8(object->getJumps());
+		}
 	}
 
 	//кнопка, яка виводить текст(початковий)
 	private: System::Void DisplayTextButton_Click(System::Object^ sender, System::EventArgs^ e) {
 		InfoTextBox->Clear();
-		if (!object->getText().empty()) {
+		if (object->getText().empty()) {
 			MessageBox::Show(L"Спочатку натисніть «Знайти слово».", L"Помилка");
 			return;
 		}
@@ -328,6 +338,7 @@ namespace lab9 {
 
 		InfoTextBox->Text = "Індивідуальне завдання:" + Environment::NewLine +
 			"Текст:" + Environment::NewLine + fromUtf8(object->getText()) + Environment::NewLine +
+			"Слово:" + fromUtf8(object->getPattern()) + Environment::NewLine +
 			"n: " + index_n + Environment::NewLine +
 			"i: " + index_i + Environment::NewLine +
 			"Текст після обміну:" + Environment::NewLine + fromUtf8(result_text) +
@@ -336,6 +347,16 @@ namespace lab9 {
 		for (int i = 0; i < result.size();i++) {
 			InfoTextBox->Text += Convert::ToString(result[i]) + " ";
 		}
+
+		InfoTextBox->Text += Environment::NewLine + L"Стрибки КМП:" + Environment::NewLine;
+
+		if (object->getJumps().empty()) {
+			InfoTextBox->Text += L"Переходів через LPS не було.";
+		}
+		else {
+			InfoTextBox->Text += fromUtf8(object->getJumps());
+		}
+
 	}
 };
 }

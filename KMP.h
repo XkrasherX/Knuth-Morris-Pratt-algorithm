@@ -12,6 +12,19 @@ private:
     string pattern; //змінна слова
     vector<int> LPS; //вектор префікс-функції
     vector<string> splitted_text; //вектор розділених стрічок тексту
+    string jumps; // журнал стрибків поточного пошуку
+
+    //функція яка робить стрибок у пошуку
+    void makeJump(int i, int& j) {
+        int old_j = j;
+        j = LPS[j - 1];
+
+        jumps += "i=" + to_string(i)
+            + ": j=" + to_string(old_j)
+            + " -> " + to_string(j)
+            + ", проміжок =" + to_string(old_j - j)
+            + "\r\n";
+    }
 
     //функція, яка розбиває текст на речення. Кожне речення зберігає у вектор
     void split(string s) {
@@ -74,6 +87,7 @@ private:
 
     //алгоритм кнута
     vector<int> KMP_algorithm(string& text) {
+        jumps.clear();
         int pattern_size = pattern.length();
         int text_size = text.length();
 
@@ -94,14 +108,14 @@ private:
             //якщо знайшли відразу все слово
             if (j == pattern_size) {
                 ans.push_back(i - j);
-                j = LPS[j - 1]; //індекс залишає ту частину кінця збігу, яка ще може бути початком наступного збігу
+                makeJump(i, j); //індекс залишає ту частину кінця збігу, яка ще може бути початком наступного збігу
             }
       
             //якщо символи різні
             else if (i < text_size && pattern[j] != text[i]) {
                 //частина зразка вже збіглася
                 if (j != 0) {
-                    j = LPS[j - 1];
+                    makeJump(i, j);
                 }
                 //взагалі нема збігу
                 else {
@@ -115,6 +129,15 @@ private:
 public:
     //геттер тексту
     string getText() const { return text; }
+
+    //геттер шуканого слова
+    string getPattern() const { return pattern; }
+
+    //геттер стрибку
+    string getJumps() const {
+        return jumps;
+    }
+
     //к-ть стрічок в тексті
     int stringCount() { return splitted_text.size(); }
 
