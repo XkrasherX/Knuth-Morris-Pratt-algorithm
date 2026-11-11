@@ -22,7 +22,7 @@ private:
         jumps += "i=" + to_string(i)
             + ": j=" + to_string(old_j)
             + " -> " + to_string(j)
-            + ", проміжок =" + to_string(old_j - j)
+            + ", зміщення =" + to_string(old_j - j)
             + "\r\n";
     }
 
